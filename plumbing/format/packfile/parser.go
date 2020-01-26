@@ -321,7 +321,11 @@ func (p *Parser) get(o *objectInfo, buf *bytes.Buffer) error {
 			return err
 		}
 
-		_, err = buf.ReadFrom(io.LimitReader(r, e.Size()))
+		size := e.Size()
+		_, err = buf.ReadFrom(io.LimitReader(r, size))
+		if size == 0 && err == io.EOF { // If there was nothing to read, discard the EOF.
+			err = nil
+		}
 		return err
 	}
 
